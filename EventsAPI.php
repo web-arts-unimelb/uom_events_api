@@ -124,6 +124,8 @@ class EventsAPI {
   /**
    * Fetch an event by id.
    *
+   * @param $id
+   *   An event id.
    * @param $full
    *   Boolean flag that determines whether to return minimum
    *   event info or a full set of data.
@@ -131,7 +133,7 @@ class EventsAPI {
    * @return
    *   An event object.
    */
-  function getEvent($id) {
+  function getEvent($id, $full = FALSE) {
     return $this->fetchData('events/' . rawurlencode($id), $full);
   }
 
@@ -267,7 +269,7 @@ class EventsAPI {
    *
    * The callback defaults to file_get_contents().
    */
-  function setCallback($callback, $options = FALSE) {
+  function setCallback($callback, $options = array()) {
     $this->callback = $callback;
     $this->callback_options = $options;
   }
@@ -302,8 +304,6 @@ class EventsAPI {
    * @param $full
    *   Boolean flag that determines whether to return minimum
    *   event info or a full set of data.
-   *
-   * @return
    *
    * @return
    *   An array of objects or FALSE on error.
