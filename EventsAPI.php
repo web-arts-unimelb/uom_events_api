@@ -47,6 +47,11 @@ class EventsAPI {
   private $parser_options = FALSE;
 
   /**
+   * Events display mode.
+   */
+  private $display;
+
+  /**
    * Constructor.
    *
    * @param $key
@@ -63,51 +68,71 @@ class EventsAPI {
   /**
    * Fetch all upcoming events.
    *
+   * @param $full
+   *   Boolean flag that determines whether to return minimum
+   *   event info or a full set of data.
+   *
    * @return
    *   An array of event objects.
    */
-  function currentEvents() {
-    return $this->fetchData('events/current');
+  function currentEvents($full = FALSE) {
+    return $this->fetchData('events/current', $full);
   }
 
   /**
    * Fetch all upcoming events with a specific tag.
    *
+   * @param $full
+   *   Boolean flag that determines whether to return minimum
+   *   event info or a full set of data.
+   *
    * @return
    *   An array of event objects.
    */
-  function currentEventsByTag($tag) {
-    return $this->fetchData('events/current/tagged/' . rawurlencode($tag));
+  function currentEventsByTag($tag, $full = FALSE) {
+    return $this->fetchData('events/current/tagged/' . rawurlencode($tag), $full);
   }
 
   /**
    * Fetch all upcoming events of a specific type.
    *
+   * @param $full
+   *   Boolean flag that determines whether to return minimum
+   *   event info or a full set of data.
+   *
    * @return
    *   An array of event objects.
    */
   function currentEventsByType($type) {
-    return $this->fetchData('events/current/type/' . rawurlencode($type));
+    return $this->fetchData('events/current/type/' . rawurlencode($type), $full);
   }
 
   /**
    * Fetch all upcoming events hosted by a specific department.
    *
+   * @param $full
+   *   Boolean flag that determines whether to return minimum
+   *   event info or a full set of data.
+   *
    * @return
    *   An array of event objects.
    */
   function currentEventsByHost($host) {
-    return $this->fetchData('events/current/hosted_by/' . rawurlencode($host));
+    return $this->fetchData('events/current/hosted_by/' . rawurlencode($host), $full);
   }
 
   /**
    * Fetch an event by id.
    *
+   * @param $full
+   *   Boolean flag that determines whether to return minimum
+   *   event info or a full set of data.
+   *
    * @return
    *   An event object.
    */
   function getEvent($id) {
-    return $this->fetchData('events/' . rawurlencode($id));
+    return $this->fetchData('events/' . rawurlencode($id), $full);
   }
 
   /**
@@ -257,6 +282,12 @@ class EventsAPI {
     $this->parser_options = $options;
   }
 
+  /**
+   * Set a flag to retrieve full event info.
+   */
+  function displayFull() {
+    $this->display = 'full';
+  }
 
   /**
    * Below here are the internal methods used to actually retrieve and
@@ -268,6 +299,11 @@ class EventsAPI {
    *
    * @param $url
    *   A relative URL path.
+   * @param $full
+   *   Boolean flag that determines whether to return minimum
+   *   event info or a full set of data.
+   *
+   * @return
    *
    * @return
    *   An array of objects or FALSE on error.
@@ -275,7 +311,13 @@ class EventsAPI {
    * This method is mostly copied from the Drupal 6 drupal_http_request()
    * function so that we can do a little bit of error checking.
    */
-  private function fetchData($url) {
+  private function fetchData($url, $full = FALSE) {
+    // Set the flag if the user wants a full result.
+    if ($full) {
+      $this->displayFull();
+    }
+
+    // Construct a URL.
     $url = $this->buildEndpoint($url);
 
     // Fetch data from the constructed endpoint URL.
@@ -285,7 +327,7 @@ class EventsAPI {
     }
 
     // Parse out the data we want.
-    $result = call_user_func_array($this->parser, array($response));
+    $result = call_user_func_array($this->parser, array($response, $this->parser_options));
     if ($result === FALSE) {
       return FALSE;
     }
@@ -303,10 +345,15 @@ class EventsAPI {
    *   A valid API endpoint URL.
    */
   private function buildEndpoint($url) {
-    $params = array(
-      'auth_token' => $this->api_key
-    );
-    $query  = http_build_query($params);
+    $params = array('auth_token' => $this->api_key);
+
+    // Use the global display flag to determine if the user wants
+    // a full event display.
+    if (!empty($this->display)) {
+      $params['display'] = $this->display;
+    }
+
+    $query = http_build_query($params);
     return 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '?' . $query;
   }
 

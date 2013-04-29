@@ -16,10 +16,10 @@ Usage:
 
 Available public methods:
 
- * currentEvents()
- * currentEventsByTag($tag)
- * currentEventsByType($type)
- * currentEventsByHost($host)
+ * currentEvents($full = FALSE)
+ * currentEventsByTag($tag, $full = FALSE)
+ * currentEventsByType($type, $full = FALSE)
+ * currentEventsByHost($host, $full = FALSE)
  * getEvent($id)
  * allPresenters()
  * getPresenter($id)
@@ -32,9 +32,13 @@ Available public methods:
  * allHosts()
  * currentHosts()
 
-It is possible to override the functions used to retrieve and parse the
-data. This allows you to use functions internal to your app and possibly
-do some error checking etc.
+You can set the event methods to return a full set of info via a global flag:
+
+ * displayFull()
+
+It is possible to override the functions used to retrieve and parse the data.
+This allows you to use functions internal to your app and possibly do some
+error checking etc.
 
  * setCallback($callback, $options = FALSE)
  * setParser($parser, $options = NULL)
