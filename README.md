@@ -4,7 +4,7 @@ University of Melbourne Events API
 Provides a PHP wrapper for the events.unimelb.edu.au API.
 
 Usage:
-
+```php
   $key = '... my api key ...';
   $api = new EventsAPI($key);
   $events = $api->currentEvents();
@@ -12,6 +12,7 @@ Usage:
   foreach ($events as $event) {
     print $event->title;
   }
+```
 
 Available public methods:
 
