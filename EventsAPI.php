@@ -103,7 +103,7 @@ class EventsAPI {
    * @return
    *   An array of event objects.
    */
-  function currentEventsByType($type) {
+  function currentEventsByType($type, $full = FALSE) {
     return $this->fetchData('events/current/type/' . rawurlencode($type), $full);
   }
 
@@ -117,7 +117,7 @@ class EventsAPI {
    * @return
    *   An array of event objects.
    */
-  function currentEventsByHost($host) {
+  function currentEventsByHost($host, $full = FALSE) {
     return $this->fetchData('events/current/hosted_by/' . rawurlencode($host), $full);
   }
 
