@@ -43,4 +43,8 @@ error checking etc.
  * setFetcher($fetcher, $options = FALSE)
  * setParser($parser, $options = NULL)
 
+You can specify a callback name and turn the response into JSONP:
+
+  * setCallback($callback)
+
 See http://events.unimelb.edu.au/admin for API keys and more information.

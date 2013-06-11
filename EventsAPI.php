@@ -52,6 +52,11 @@ class EventsAPI {
   private $display;
 
   /**
+   * Optional JSONP callback.
+   */
+  private $callback;
+
+  /**
    * Constructor.
    *
    * @param $key
@@ -285,6 +290,13 @@ class EventsAPI {
   }
 
   /**
+   * Turn the response into JSONP with the specified callback.
+   */
+  function setCallback($callback) {
+    $this->callback = $callback;
+  }
+
+  /**
    * Set a flag to retrieve full event info.
    */
   function displayFull() {
@@ -351,6 +363,11 @@ class EventsAPI {
     // a full event display.
     if (!empty($this->display)) {
       $params['display'] = $this->display;
+    }
+
+    // Add the callback if set.
+    if (!empty($this->callback)) {
+      $params['callback'] = $this->callback;
     }
 
     $query = http_build_query($params);
