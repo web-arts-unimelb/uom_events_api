@@ -40,7 +40,7 @@ It is possible to override the functions used to retrieve and parse the data.
 This allows you to use functions internal to your app and possibly do some
 error checking etc.
 
- * setCallback($callback, $options = FALSE)
+ * setFetcher($fetcher, $options = FALSE)
  * setParser($parser, $options = NULL)
 
 See http://events.unimelb.edu.au/admin for API keys and more information.

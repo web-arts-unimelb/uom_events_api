@@ -27,17 +27,17 @@ class EventsAPI {
   private $api_key;
 
   /**
-   * Callback function to fetch the data.
+   * Function to fetch the data.
    */
-  private $callback = 'file_get_contents';
+  private $fetcher = 'file_get_contents';
 
   /**
-   * Callback function options.
+   * Fetcher function options.
    */
-  private $callback_options = FALSE;
+  private $fetcher_options = FALSE;
 
   /**
-   * Callback function to parse the data.
+   * Function to parse the data.
    */
   private $parser = 'json_decode';
 
@@ -265,13 +265,13 @@ class EventsAPI {
    */
 
   /**
-   * Set the callback function used to fetch the raw data.
+   * Set the function used to fetch the raw data.
    *
-   * The callback defaults to file_get_contents().
+   * The fetcher defaults to file_get_contents().
    */
-  function setCallback($callback, $options = array()) {
-    $this->callback = $callback;
-    $this->callback_options = $options;
+  function setFetcher($fetcher, $options = array()) {
+    $this->fetcher = $fetcher;
+    $this->fetcher_options = $options;
   }
 
   /**
@@ -321,7 +321,7 @@ class EventsAPI {
     $url = $this->buildEndpoint($url);
 
     // Fetch data from the constructed endpoint URL.
-    $response = call_user_func_array($this->callback, array($url, $this->callback_options));
+    $response = call_user_func_array($this->fetcher, array($url, $this->fetcher_options));
     if ($response === FALSE) {
       return FALSE;
     }
