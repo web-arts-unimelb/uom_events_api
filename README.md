@@ -45,6 +45,11 @@ error checking etc.
 
 You can specify a callback name and turn the response into JSONP:
 
-  * setCallback($callback)
+ * setCallback($callback)
+
+You can add filters to limit returned events. Currently the `month' filter
+allows you to limit results by month.
+
+ * setFilter($filter, $values)
 
 See http://events.unimelb.edu.au/admin for API keys and more information.

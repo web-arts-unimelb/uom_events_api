@@ -22,6 +22,13 @@ class EventsAPI {
   const EVENTS_API = 'api/v1';
 
   /**
+   * The format the API outputs data in.
+   *
+   * Options are: JSON, JSONP, XML.
+   */
+  const EVENTS_API_FORMAT = 'json';
+
+  /**
    * The key to access the API.
    */
   private $api_key;
@@ -55,6 +62,16 @@ class EventsAPI {
    * Optional JSONP callback.
    */
   private $callback;
+
+  /**
+   * Optional filter key.
+   */
+  private $filter;
+
+  /**
+   * Filter values to be passed to the filter specified by the $filter key.
+   */
+  private $filters;
 
   /**
    * Constructor.
@@ -297,6 +314,17 @@ class EventsAPI {
   }
 
   /**
+   * Set filters that should be passed to the API backend.
+   *
+   * @todo: These filters are not validated, so it's possible to overwrite
+   * the `display', `api_key' and other required parameters currently.
+   */
+  function setFilter($filter, $values) {
+    $this->filter  = $filter;
+    $this->filters = $values;
+  }
+
+  /**
    * Set a flag to retrieve full event info.
    */
   function displayFull() {
@@ -370,8 +398,16 @@ class EventsAPI {
       $params['callback'] = $this->callback;
     }
 
+    // Add any filter values if a filter key is set.
+    if (!empty($this->filter)) {
+      $params['filter'] = $this->filter;
+      foreach ($this->filters as $key => $value) {
+        $params[$key] = $value;
+      }
+    }
+
     $query = http_build_query($params);
-    return 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '?' . $query;
+    return 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '.'. EventsAPI::EVENTS_API_FORMAT . '?' . $query;
   }
 
 } // End Class
