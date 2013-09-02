@@ -118,11 +118,10 @@ class EventsAPI {
 	/**
    * Fetch past events counting from today
    */
-  function pastEventsByTag($tag, $full = FALSE) {
+  function pastEventsByTag($tag, $num_of_years, $full = FALSE) {
   	$curr_month = date('n');
   	$curr_year = date('Y');
   	$curr_date = date('j');
-  	$num_of_years = 2;
   	
   	$return_data = array();  	
   	for($i=0; $i<$num_of_years; $i++) {
