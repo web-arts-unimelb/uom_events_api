@@ -115,6 +115,49 @@ class EventsAPI {
     return $this->fetchData('events/current/tagged/' . rawurlencode($tag), $full);
   }
 
+	/**
+   * Fetch past events counting from today
+   */
+  function pastEventsByTag($tag, $full = FALSE) {
+  	$curr_month = date('n');
+  	$curr_year = date('Y');
+  	$curr_date = date('j');
+  	$num_of_years = 2;
+  	
+  	$return_data = array();  	
+  	for($i=0; $i<$num_of_years; $i++) {
+  		$filter_year = $curr_year - $i;
+  		for($k=0; $k<$curr_month; $k++) {
+  			$filter_month = $curr_month - $k;
+  			$options = array('month'=>$filter_month, 'year'=>$filter_year);
+  			
+  			// Set filter to use month
+  			$this->setFilter('month', $options); 
+  			$month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
+  			
+  			$filtered_month_events = array();
+  			if($curr_year == $filter_year && $curr_month == $filter_month) {
+  				foreach($month_events as $single_event) {
+  					if( strtotime($single_event->start_time) <= time() ) {
+  						$filtered_month_events[] = $single_event;
+  					}
+  				}
+  			}
+  			else {
+  				$filtered_month_events = $month_events;
+  			}
+  			
+  			if(count($filtered_month_events) > 0) {
+  				foreach($filtered_month_events as $filtered_month_event) {
+  					$return_data[] = $filtered_month_event;
+  				}
+  			}	
+  		}
+  	}
+  	
+  	return $return_data;
+  }
+
   /**
    * Fetch all upcoming events of a specific type.
    *
