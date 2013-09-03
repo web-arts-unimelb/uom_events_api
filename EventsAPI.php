@@ -56,7 +56,7 @@ class EventsAPI {
   /**
    * Events display mode.
    */
-  private $display;
+  private $full;
 
   /**
    * Optional JSONP callback.
@@ -370,7 +370,7 @@ class EventsAPI {
    * Set a flag to retrieve full event info.
    */
   function displayFull() {
-    $this->display = 'full';
+    $this->full = 'true';
   }
 
   /**
@@ -431,8 +431,8 @@ class EventsAPI {
 
     // Use the global display flag to determine if the user wants
     // a full event display.
-    if (!empty($this->display)) {
-      $params['display'] = $this->display;
+    if (!empty($this->full)) {
+    	$params['full'] = $this->full;
     }
 
     // Add the callback if set.
@@ -449,7 +449,9 @@ class EventsAPI {
     }
 
     $query = http_build_query($params);
-    return 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '.'. EventsAPI::EVENTS_API_FORMAT . '?' . $query;
+    $return_url = 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '.'. EventsAPI::EVENTS_API_FORMAT . '?' . $query;
+    
+    return $return_url;
   }
 
 } // End Class
