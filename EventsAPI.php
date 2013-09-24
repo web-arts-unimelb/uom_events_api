@@ -157,6 +157,19 @@ class EventsAPI {
   	return $return_data;
   }
 
+	function pastMonthEventsByTag($tag, $full=FALSE) {
+		$curr_month = date('n');
+    $curr_year = date('Y');
+
+		$options = array('month'=>$curr_month, 'year'=>$curr_year);
+
+		// Set filter to use month
+    $this->setFilter('month', $options);
+    $return_data = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);	
+
+		return $return_data;
+	}
+
   /**
    * Fetch all upcoming events of a specific type.
    *
