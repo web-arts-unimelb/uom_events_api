@@ -122,14 +122,21 @@ class EventsAPI {
   	$curr_month = date('n');
   	$curr_year = date('Y');
   	$curr_date = date('j');
-  	
+ 
   	$return_data = array();  	
   	for($i=0; $i<$num_of_years; $i++) {
-  		$filter_year = $curr_year - $i;
-  		for($k=0; $k<$curr_month; $k++) {
-  			$filter_month = $curr_month - $k;
+		
+			$filter_year = $curr_year - $i;	
+			if($i == 0) {
+				$month_counter = $curr_month;
+			} else {
+				$month_counter = 12;
+			}
+  		
+			for($k=0; $k<$month_counter; $k++) {
+  			$filter_month = $month_counter - $k;
   			$options = array('month'=>$filter_month, 'year'=>$filter_year);
-  			
+  
   			// Set filter to use month
   			$this->setFilter('month', $options); 
   			$month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
