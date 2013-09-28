@@ -164,17 +164,85 @@ class EventsAPI {
   	return $return_data;
   }
 
-	function pastMonthEventsByTag($tag, $full=FALSE) {
-		$curr_month = date('n');
-    $curr_year = date('Y');
+	function pastMonthEventsByTag($tag, $max_event_num=5, $full=FALSE) {
+		$return_data = array();
+		$filter_month = $curr_month = date('n');
+    $filter_year = $curr_year = date('Y');
+		$event_num_looking_for = $max_event_num;	
+	
+		// Go back for 1 year only
+		for($i=0; $i<=1; $i++) {
+			$filter_year = $filter_year - $i;
 
-		$options = array('month'=>$curr_month, 'year'=>$curr_year);
+			if($filter_year == $curr_year) {
+				while($filter_month >= 1) { 
+					$options = array('month'=>$filter_month, 'year'=>$filter_year);	
+					$month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
+					$month_events_num = count($month_events);
 
-		// Set filter to use month
-    $this->setFilter('month', $options);
-    $return_data = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);	
+					if($month_events_num >= $event_num_looking_for) {
+						for($k=0; $k<$event_num_looking_for; $k++) {
+							$month_event = array_shift($month_events);
+							array_push($return_data, $month_event);
+						}
 
-		return $return_data;
+						$event_num_looking_for = 0;
+					} 
+					elseif($month_events_num > 0 && $month_events_num < $event_num_looking_for) {
+						for($x=0; $x<$month_events_num; $x++) {
+							$month_event = array_shift($month_events);
+              array_push($return_data, $month_event);	
+						}
+
+						$event_num_looking_for = $event_num_looking_for - $month_events_num;
+					}
+					else {
+						continue;
+					}
+
+					// Completely return 
+          if(count($return_data) >= $max_event_num) {
+						return $return_data;
+          }
+
+					$filter_month = $filter_month - 1;	
+				}		
+			} else {
+				$filter_month = 12;
+				while($filter_month >= 1) {
+					$options = array('month'=>$filter_month, 'year'=>$filter_year);
+          $month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
+          $month_events_num = count($month_events);
+
+          if($month_events_num >= $event_num_looking_for) {
+            for($k=0; $k<$event_num_looking_for; $k++) {
+              $month_event = array_shift($month_events);
+              array_push($return_data, $month_event);
+            }
+
+            $event_num_looking_for = 0;
+          }
+          elseif($month_events_num > 0 && $month_events_num < $event_num_looking_for) {
+            for($x=0; $x<$month_events_num; $x++) {
+              $month_event = array_shift($month_events);
+              array_push($return_data, $month_event);
+            }
+
+            $event_num_looking_for = $event_num_looking_for - $month_events_num;
+          }
+          else {
+            continue;
+          }
+
+          // Completely return 
+          if(count($return_data) >= $max_event_num) {
+            return $return_data;
+          }
+
+          $filter_month = $filter_month - 1;
+				}
+			}
+		}
 	}
 
   /**
