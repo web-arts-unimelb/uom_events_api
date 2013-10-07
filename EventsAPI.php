@@ -181,10 +181,10 @@ class EventsAPI {
 					$month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
 					$month_events_num = count($month_events);
 
-					// Sort the events
-					usort($month_events, "_my_event_compare_desc");	
-
 					if($month_events_num >= $event_num_looking_for) {
+						// Sort the events
+          	usort($month_events, "_my_event_compare_desc");
+
 						for($k=0; $k<$event_num_looking_for; $k++) {
 							$month_event = array_shift($month_events);
 							array_push($return_data, $month_event);
