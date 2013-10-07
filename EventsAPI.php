@@ -176,9 +176,13 @@ class EventsAPI {
 
 			if($filter_year == $curr_year) {
 				while($filter_month >= 1) { 
-					$options = array('month'=>$filter_month, 'year'=>$filter_year);	
+					$options = array('month'=>$filter_month, 'year'=>$filter_year);
+					$this->setFilter('month', $options);	
 					$month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
 					$month_events_num = count($month_events);
+
+					// Sort the events
+					usort($month_events, "_my_event_compare_desc");	
 
 					if($month_events_num >= $event_num_looking_for) {
 						for($k=0; $k<$event_num_looking_for; $k++) {
@@ -189,6 +193,9 @@ class EventsAPI {
 						$event_num_looking_for = 0;
 					} 
 					elseif($month_events_num > 0 && $month_events_num < $event_num_looking_for) {
+						// Sort the events
+          	usort($month_events, "_my_event_compare_desc");
+
 						for($x=0; $x<$month_events_num; $x++) {
 							$month_event = array_shift($month_events);
               array_push($return_data, $month_event);	
@@ -202,6 +209,9 @@ class EventsAPI {
 
 					// Completely return 
           if(count($return_data) >= $max_event_num) {
+						// Sort the events
+          	usort($return_data, "_my_event_compare_desc");
+
 						return $return_data;
           }
 
