@@ -202,8 +202,10 @@ class EventsAPI {
 						}
 
 						$event_num_looking_for = $event_num_looking_for - $month_events_num;
+						$filter_month = $filter_month - 1;
 					}
 					else {
+						$filter_month = $filter_month - 1;
 						continue;
 					}
 
@@ -214,17 +216,19 @@ class EventsAPI {
 
 						return $return_data;
           }
-
-					$filter_month = $filter_month - 1;	
 				}		
 			} else {
 				$filter_month = 12;
 				while($filter_month >= 1) {
 					$options = array('month'=>$filter_month, 'year'=>$filter_year);
+					$this->setFilter('month', $options);
           $month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
           $month_events_num = count($month_events);
 
           if($month_events_num >= $event_num_looking_for) {
+						// Sort the events
+            usort($month_events, "_my_event_compare_desc");
+
             for($k=0; $k<$event_num_looking_for; $k++) {
               $month_event = array_shift($month_events);
               array_push($return_data, $month_event);
@@ -233,14 +237,19 @@ class EventsAPI {
             $event_num_looking_for = 0;
           }
           elseif($month_events_num > 0 && $month_events_num < $event_num_looking_for) {
+						// Sort the events
+            usort($month_events, "_my_event_compare_desc");
+
             for($x=0; $x<$month_events_num; $x++) {
               $month_event = array_shift($month_events);
               array_push($return_data, $month_event);
             }
 
             $event_num_looking_for = $event_num_looking_for - $month_events_num;
+						$filter_month = $filter_month - 1;
           }
           else {
+						$filter_month = $filter_month - 1;
             continue;
           }
 
@@ -248,11 +257,13 @@ class EventsAPI {
           if(count($return_data) >= $max_event_num) {
             return $return_data;
           }
-
-          $filter_month = $filter_month - 1;
 				}
 			}
 		}
+		// End loop
+
+		// If it exhausts the loop, but still not enough data, return whatever in $return_data
+		return $return_data; 
 	}
 
   /**
@@ -548,7 +559,7 @@ class EventsAPI {
 
     $query = http_build_query($params);
     $return_url = 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '.'. EventsAPI::EVENTS_API_FORMAT . '?' . $query;
-    
+
     return $return_url;
   }
 
