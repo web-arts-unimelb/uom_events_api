@@ -169,7 +169,7 @@ class EventsAPI {
 		$filter_month = $curr_month = date('n');
     $filter_year = $curr_year = date('Y');
 		$event_num_looking_for = $max_event_num;	
-	
+
 		// Go back for 1 year only
 		for($i=0; $i<=1; $i++) {
 			$filter_year = $filter_year - $i;
@@ -179,12 +179,17 @@ class EventsAPI {
 					$options = array('month'=>$filter_month, 'year'=>$filter_year);
 					$this->setFilter('month', $options);	
 					$month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
+
+					// Sort the events
+          usort($month_events, "_my_event_compare_desc");
+
+          // Remove any current/upcoming events
+          $month_events = $this->_filter_past_events($month_events);
+
+					// Count
 					$month_events_num = count($month_events);
 
 					if($month_events_num >= $event_num_looking_for) {
-						// Sort the events
-          	usort($month_events, "_my_event_compare_desc");
-
 						for($k=0; $k<$event_num_looking_for; $k++) {
 							$month_event = array_shift($month_events);
 							array_push($return_data, $month_event);
@@ -193,9 +198,6 @@ class EventsAPI {
 						$event_num_looking_for = 0;
 					} 
 					elseif($month_events_num > 0 && $month_events_num < $event_num_looking_for) {
-						// Sort the events
-          	usort($month_events, "_my_event_compare_desc");
-
 						for($x=0; $x<$month_events_num; $x++) {
 							$month_event = array_shift($month_events);
               array_push($return_data, $month_event);	
@@ -224,11 +226,11 @@ class EventsAPI {
 					$this->setFilter('month', $options);
           $month_events = $this->fetchData('events/all/tagged/'. rawurlencode($tag), $full);
           $month_events_num = count($month_events);
+	
+					// Sort the events
+          usort($month_events, "_my_event_compare_desc");
 
           if($month_events_num >= $event_num_looking_for) {
-						// Sort the events
-            usort($month_events, "_my_event_compare_desc");
-
             for($k=0; $k<$event_num_looking_for; $k++) {
               $month_event = array_shift($month_events);
               array_push($return_data, $month_event);
@@ -237,7 +239,6 @@ class EventsAPI {
             $event_num_looking_for = 0;
           }
           elseif($month_events_num > 0 && $month_events_num < $event_num_looking_for) {
-						// Sort the events
             usort($month_events, "_my_event_compare_desc");
 
             for($x=0; $x<$month_events_num; $x++) {
@@ -265,6 +266,32 @@ class EventsAPI {
 		// If it exhausts the loop, but still not enough data, return whatever in $return_data
 		return $return_data; 
 	}
+
+	function _filter_past_events($month_events) {
+		$return_data = array();
+
+		$month_events = array_filter($month_events, function($obj){
+    	if(isset($obj->start_time)) {
+    		$event_start_time = strtotime($obj->start_time);
+      	$current_time = time();
+      	if($event_start_time < $current_time)
+      		return true;
+      	else
+      		return false;
+    	}
+    	else {
+    	  return false;
+    	}
+   	});
+
+    foreach($month_events as $event) {
+			if(!is_null($event))
+				$return_data[] = $event;	
+    }
+
+		return $return_data;
+	}
+
 
   /**
    * Fetch all upcoming events of a specific type.
