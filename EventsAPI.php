@@ -568,7 +568,7 @@ class EventsAPI {
     // Use the global display flag to determine if the user wants
     // a full event display.
     if (!empty($this->full)) {
-    	$params['full'] = $this->full;
+      $params['full'] = $this->full;
     }
 
     // Add the callback if set.
@@ -586,6 +586,9 @@ class EventsAPI {
 
     $query = http_build_query($params);
     $return_url = 'http://' . EventsAPI::EVENTS_HOSTNAME . '/'. EventsAPI::EVENTS_API . '/' . $url . '.'. EventsAPI::EVENTS_API_FORMAT . '?' . $query;
+
+		//test
+		//dsm($return_url);
 
     return $return_url;
   }
